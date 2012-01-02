@@ -1,0 +1,5 @@
+.idea/*
+tmp/*
+public/assets/*
+local.php
+database.php

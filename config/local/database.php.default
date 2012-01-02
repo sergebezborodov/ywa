@@ -1,0 +1,13 @@
+<?php
+return array(
+        'connectionString' => 'mysql:host=localhost;dbname=',
+        'emulatePrepare' => true,
+        'username' => '',
+        'password' => '',
+        'charset' => 'utf8',
+
+        // включаем профайлер
+        'enableProfiling' => true,
+        // показываем значения параметров
+        'enableParamLogging' => true,
+);
