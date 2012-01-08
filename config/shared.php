@@ -1,4 +1,7 @@
 <?php
+/**
+ * Общие настройки для всех типов приложений
+ */
 
 define('DS', DIRECTORY_SEPARATOR);
 define('ROOT', dirname(__FILE__) .DS. '..');

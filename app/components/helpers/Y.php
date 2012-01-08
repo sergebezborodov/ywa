@@ -567,4 +567,12 @@ class Y
     public static function nf() {
         return Yii::app()->getNumberFormatter();
     }
+
+    /**
+     * @static
+     * @return CDateFormatter
+     */
+    public static function df() {
+        return Yii::app()->getDateFormatter();
+    }
 }

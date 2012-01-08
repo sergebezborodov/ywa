@@ -1,41 +1,32 @@
 <?php
 /**
- * Controller is the customized base controller class.
- * All controller classes for this application should extend from this base class.
+ * Базовый контроллер приложения
  *
  * @property string pageTitle
  */
 abstract class BaseController extends CController {
 	/**
-	 * @var string the default layout for the controller view. Defaults to '//layouts/column1',
-	 * meaning using a single column layout. See 'protected/views/layouts/1column.php'.
+	 * @var string текущий layout
 	 */
 	public $layout = '//layouts/main';
-    
-	/**
-	 * @var array context menu items. This property will be assigned to {@link CMenu::items}.
-	 */
-	public $menu = array();
 
 	/**
-	 * @var array the breadcrumbs of the current page. The value of this property will
-	 * be assigned to {@link CBreadcrumbs::links}. Please refer to {@link CBreadcrumbs::links}
-	 * for more details on how to specify this property.
+	 * @var array
 	 */
 	public $breadcrumbs = array();
-	
-	public $isAdmin = false;
-    
 
+    /**
+     * @var string meta описание
+     */
     public $metaDesc = '';
+
+    /**
+     * @var string meta ключевые слова
+     */
     public $metaKeys = '';
 
-
-    public $adminMenu = array();
-
 	/**
-	 * Страница по умолчанию для редиректа с ошибкой
-	 * @var string
+	 * @var string страница по умолчанию для редиректа с ошибкой
 	 */
 	protected $_defaultErrorRedirect = '/';
 
@@ -140,33 +131,6 @@ abstract class BaseController extends CController {
 	}
 
     /**
-     * Поиск нужно вьюхи в зависимости от языка
-     *
-     * @param $viewName
-     * @param $viewPath
-     * @param $basePath
-     * @param null $moduleViewPath
-     * @return bool|string
-     */
-	public function resolveViewFile($viewName, $viewPath, $basePath, $moduleViewPath=null) {
-        if(empty($viewName))
-            return false;
-
-        if(($renderer=Yii::app()->getViewRenderer())!==null)
-            $extension=$renderer->fileExtension;
-        else
-            $extension='.php';
-        if($viewName[0]==='/')
-            $viewFile=$basePath.$viewName.$extension;
-        else if(strpos($viewName,'.'))
-            $viewFile=Yii::getPathOfAlias($viewName).$extension;
-        else
-            $viewFile=$viewPath.DIRECTORY_SEPARATOR.$viewName.$extension;
-        //такой папки точно нет
-        return Yii::app()->findLocalizedFile($viewFile,'+++');
-    }
-
-    /**
      * Вспомогательные действия
      *
      * @param $action
@@ -179,8 +143,25 @@ abstract class BaseController extends CController {
             $this->redirect(substr($uri, 0, strlen($uri) - 1), true, 301);
         }
 
+        return true;
+    }
+
+    /**
+     * Покдлючение скриптов
+     *
+     * @param $view
+     * @return bool
+     */
+    public function beforeRender($view) {
+        parent::beforeRender($view);
+
+        // для ajax никакие скрипт файлы не подключаем
+        if (Y::isAjaxRequest()) {
+            return true;
+        }
+
         $actionScriptFile = Yii::getPathOfAlias("webroot.js.".Y::app()->controller->id)
-                            .'/'.Y::app()->controller->action->id . '.js';
+                                    .'/'.Y::app()->controller->action->id . '.js';
 
         if (file_exists($actionScriptFile)) {
             Yii::app()->clientScript->registerScriptFile(Html::asset($actionScriptFile));
@@ -192,8 +173,6 @@ abstract class BaseController extends CController {
         if (file_exists($sharedScriptFile)) {
             Yii::app()->clientScript->registerScriptFile(Html::asset($sharedScriptFile));
         }
-
-        return true;
     }
 
 
@@ -202,18 +181,19 @@ abstract class BaseController extends CController {
      *
      * @throws CHttpException
      * @param string $modelName
-     * @param bool $checkOwner проверять владельца по user_id
+     * @param bool $checkOwner проверять владельца по user_id\
+     * @param string $userIdFieldName название поле с id пользователя модели
      * @return ActiveRecord
      */
-    protected function _loadModel($modelName, $checkOwner = true) {
+    protected function _loadModel($modelName, $checkOwner = false, $userIdFieldName = 'user_id') {
         if (empty($_GET['id'])) {
             throw new CHttpException(400, 'Не указан id модели');
         }
         $model = BaseActiveRecord::model($modelName)->findByPk($_GET['id']);
         if ($model === null) {
-            throw new CHttpException(404, "Запись #{$_GET['id']} модели {$modelName} не найден в системе");
+            throw new CHttpException(404, "Запись #{$_GET['id']} модели {$modelName} не найдена");
         }
-        if ($checkOwner && !empty($model->user_id) && $model->user_id != Y::userId()) {
+        if ($checkOwner && !empty($model->{$userIdFieldName}) && $model->{$userIdFieldName} != Y::userId()) {
             throw new CHttpException(403, 'Доступ не разрешен');
         }
 

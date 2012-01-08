@@ -1,0 +1,13 @@
+<?php
+return array(
+        'connectionString' => 'mysql:host=localhost;dbname=ppcrobot_test',
+        'emulatePrepare' => true,
+        'username' => 'root',
+        'password' => 'planet',
+        'charset' => 'utf8',
+
+        // включаем профайлер
+        'enableProfiling' => false,
+        // показываем значения параметров
+        'enableParamLogging' => false,
+);

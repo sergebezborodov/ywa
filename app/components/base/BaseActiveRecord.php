@@ -4,8 +4,6 @@
  * Базовый класс ActiveRecord
  */
 abstract class BaseActiveRecord extends CActiveRecord {
-
-    const ERROR_VALIDATE = 10;
 	
    /**
     * Поле которое содержит дату создания записи
@@ -18,6 +16,17 @@ abstract class BaseActiveRecord extends CActiveRecord {
     * @var string
     */
     protected $_updatedField = 'updated_date';
+
+    /**
+     * @var string название поля для url alias названия
+     */
+    protected $_slugField = 'slug';
+
+    /**
+     * @var string название поля с названием объекта (title, name, etc)
+     */
+    protected $_titleField = 'title';
+
     
     protected $_lastErrorMessage = null;
  
@@ -49,9 +58,11 @@ abstract class BaseActiveRecord extends CActiveRecord {
     	if (!parent::beforeValidate()) {
     		return false;
     	}
-    	if (isset($this->metadata->tableSchema->columns['slug'], $this->metadata->tableSchema->columns['title']) 
-    		&& empty($this->slug)){
-    		$this->slug = $this->createUrlName($this->title);
+    	if (isset($this->metadata->tableSchema->columns[$this->_slugField],
+                 $this->metadata->tableSchema->columns[$this->_titleField])
+            && empty($this->{$this->_slugField})) {
+
+            $this->slug = $this->createUrlName($this->{$this->_titleField});
         }
     	return true;
     }
