@@ -12,9 +12,9 @@ require_once $basePath . DS.'components'.DS.'helpers'.DS.'functions.php';
 
 
 return array(
-	'basePath'    => dirname(__FILE__).DS.'..'.DS.'app',
+	'basePath'    => $basePath,
 	'name'        => 'My Web Application',
-    'runtimePath' => $basePath,
+    'runtimePath' => ROOT.DS.'tmp',
 
 	// preloading 'log' component
 	'preload' => array('log'),

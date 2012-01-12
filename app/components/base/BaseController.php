@@ -8,7 +8,7 @@ abstract class BaseController extends CController {
 	/**
 	 * @var string текущий layout
 	 */
-	public $layout = '//layouts/main';
+	public $layout = '/layouts/main';
 
 	/**
 	 * @var array
@@ -173,6 +173,8 @@ abstract class BaseController extends CController {
         if (file_exists($sharedScriptFile)) {
             Yii::app()->clientScript->registerScriptFile(Html::asset($sharedScriptFile));
         }
+
+        return true;
     }
 
 
