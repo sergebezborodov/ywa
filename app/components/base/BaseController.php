@@ -4,7 +4,8 @@
  *
  * @property string pageTitle
  */
-abstract class BaseController extends CController {
+abstract class BaseController extends CController
+{
 	/**
 	 * @var string текущий layout
 	 */
@@ -28,7 +29,7 @@ abstract class BaseController extends CController {
 	/**
 	 * @var string страница по умолчанию для редиректа с ошибкой
 	 */
-	protected $_defaultErrorRedirect = '/';
+	protected $defaultErrorRedirect = '/';
 
     /**
      * Редирект с флешкой
@@ -37,7 +38,8 @@ abstract class BaseController extends CController {
      * @param array $redirect
      * @return void
      */
-	protected function _denyRequest($msg = '', $redirect = array()) {
+	protected function _denyRequest($msg = '', $redirect = array())
+    {
 		if (Y::request()->isAjaxRequest) {
 			$result = array(
 				'result'	=> 'error',
@@ -49,7 +51,7 @@ abstract class BaseController extends CController {
 				if (Y::request()->urlReferrer) {
 					$redirect = Y::request()->urlReferrer;
 				} else {
-					$redirect = $this->_defaultErrorRedirect;
+					$redirect = $this->defaultErrorRedirect;
 				}
 	        }
 	        if (!empty($msg)) {
@@ -64,7 +66,8 @@ abstract class BaseController extends CController {
      * @param string $message
      * @param array $data
      */
-    public function jsonEnd($message = '', $data = array()) {
+    public function jsonEnd($message = '', $data = array())
+    {
         Y::endJson(array(
 			'result'	=> 'ok',
 			'message'	=> $message,
@@ -76,7 +79,8 @@ abstract class BaseController extends CController {
      * @param string $message
      * @param array $data
      */
-    public function jsonError($message = '', $data = array()) {
+    public function jsonError($message = '', $data = array())
+    {
         Y::endJson(array(
 			'result'	=> 'error',
 			'message'	=> $message,
@@ -91,7 +95,8 @@ abstract class BaseController extends CController {
 	 * @param string $type тип сообщения
 	 * @return void
 	 */
-	protected function _flash($msg, $type = 'success') {
+	protected function _flash($msg, $type = 'success')
+    {
 		Yii::app()->user->setFlash($type, $msg);
 	}
 
@@ -101,7 +106,8 @@ abstract class BaseController extends CController {
      * @param  $message
      * @return void
      */
-    protected function _errorFlash($message) {
+    protected function _errorFlash($message)
+    {
         $this->_flash($message, 'error');
     }
 
@@ -111,7 +117,8 @@ abstract class BaseController extends CController {
 	 * @param int $id
 	 * @return bool
 	 */
-	public function validateId(&$id = null) {
+	public function validateId(&$id = null)
+    {
 		if (empty($id) || !is_numeric($id) || ($id != intval($id))) {
 			return false;
 		}
@@ -125,7 +132,8 @@ abstract class BaseController extends CController {
 	 * 
 	 * @return bool
 	 */
-	public function getIsMainPage() {
+	public function getIsMainPage()
+    {
 		return Y::app()->controller->id === 'site' 
 			&& Y::app()->controller->action->id === 'index';
 	}
@@ -136,7 +144,8 @@ abstract class BaseController extends CController {
      * @param $action
      * @return bool
      */
-    public function beforeAction($action) {
+    public function beforeAction($action)
+    {
         $uri = $_SERVER['REQUEST_URI'];
         if (strlen($uri) > 1
             && $uri{strlen($uri) - 1} == '/') {
@@ -152,7 +161,8 @@ abstract class BaseController extends CController {
      * @param $view
      * @return bool
      */
-    public function beforeRender($view) {
+    public function beforeRender($view)
+    {
         parent::beforeRender($view);
 
         // для ajax никакие скрипт файлы не подключаем
@@ -187,7 +197,8 @@ abstract class BaseController extends CController {
      * @param string $userIdFieldName название поле с id пользователя модели
      * @return ActiveRecord
      */
-    protected function _loadModel($modelName, $checkOwner = false, $userIdFieldName = 'user_id') {
+    protected function _loadModel($modelName, $checkOwner = false, $userIdFieldName = 'user_id')
+    {
         if (empty($_GET['id'])) {
             throw new CHttpException(400, 'Не указан id модели');
         }

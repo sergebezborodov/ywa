@@ -3,4 +3,5 @@
 /**
  * Валидация входных данных функции
  */
-class ParamException extends AppException {}
+class ParamException extends AppException
+{}

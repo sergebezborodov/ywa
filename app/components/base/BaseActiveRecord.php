@@ -3,33 +3,31 @@
 /**
  * Базовый класс ActiveRecord
  */
-abstract class BaseActiveRecord extends CActiveRecord {
+abstract class BaseActiveRecord extends CActiveRecord
+{
 	
    /**
     * Поле которое содержит дату создания записи
     * @var string
     */
-    protected $_createdField = 'created_date';
+    protected $createdField = 'created_date';
     
    /**
     * Поле которое содержит дату редактирования записи
     * @var string
     */
-    protected $_updatedField = 'updated_date';
+    protected $updatedField = 'updated_date';
 
     /**
      * @var string название поля для url alias названия
      */
-    protected $_slugField = 'slug';
+    protected $slugField = 'slug';
 
     /**
      * @var string название поля с названием объекта (title, name, etc)
      */
-    protected $_titleField = 'title';
+    protected $titleField = 'title';
 
-    
-    protected $_lastErrorMessage = null;
- 
     static protected $_transaction;
     
     /**
@@ -37,65 +35,50 @@ abstract class BaseActiveRecord extends CActiveRecord {
 	 * 
 	 * @return bool
      */
-    protected function beforeSave() {
+    protected function beforeSave()
+    {
     	if (!parent::beforeSave()) {
     		return false;
     	}
 
-        if (isset($this->metadata->tableSchema->columns[$this->_updatedField])){
-            $this->{$this->_updatedField} = new CDbExpression('NOW()');
+        if (isset($this->metadata->tableSchema->columns[$this->updatedField])){
+            $this->{$this->updatedField} = new CDbExpression('NOW()');
         }
     	if ($this->isNewRecord) {
-    		if (isset($this->metadata->tableSchema->columns[$this->_createdField])){
-            	$this->{$this->_createdField} = new CDbExpression('NOW()');
+    		if (isset($this->metadata->tableSchema->columns[$this->createdField])){
+            	$this->{$this->createdField} = new CDbExpression('NOW()');
     		}
         }
  
         return true;  
     }
-    
-    public function beforeValidate() {
+
+    /**
+     * Генерация slug при необходимости
+     *
+     * @return bool
+     */
+    public function beforeValidate()
+    {
     	if (!parent::beforeValidate()) {
     		return false;
     	}
-    	if (isset($this->metadata->tableSchema->columns[$this->_slugField],
-                 $this->metadata->tableSchema->columns[$this->_titleField])
-            && empty($this->{$this->_slugField})) {
+    	if (isset($this->metadata->tableSchema->columns[$this->slugField],
+                 $this->metadata->tableSchema->columns[$this->titleField])
+            && empty($this->{$this->slugField})) {
 
-            $this->slug = $this->createUrlName($this->{$this->_titleField});
+            $this->slug = $this->createUrlName($this->{$this->titleField});
         }
     	return true;
     }
-    
-    /**
-     * Устанавливает последнее сообщение об ошибке
-     * 
-     * @param string $message
-     * @return bool false
-     */
-    public function onError($message = null) {
-    	$this->_lastErrorMessage = $message;
-    	return false;
-    }
-    
-    /**
-     * Возвращает последнее сообщение об ошибке
-     * @return string
-     */
-    public function getLastErrorMessage() {
-    	if (empty($this->_lastErrorMessage)) {
-    		$this->_lastErrorMessage = 'Ошибка в процессе выполнения';
-    	}
-    	return $this->_lastErrorMessage;
-    }
-    
     
     /**
      * Начало транзакции
      * 
      * @return bool true
      */
-    public static function start() {
+    public static function start()
+    {
     	self::$_transaction = Yii::app()->db->beginTransaction();
     	return true;
     }
@@ -105,7 +88,8 @@ abstract class BaseActiveRecord extends CActiveRecord {
      * 
      * @return bool true
      */
-    public static function rollBack() {
+    public static function rollBack()
+    {
     	self::$_transaction->rollBack();
     	return true;
     }
@@ -115,7 +99,8 @@ abstract class BaseActiveRecord extends CActiveRecord {
      * 
      * @return bool true
      */
-    public static function commit() {
+    public static function commit()
+    {
     	self::$_transaction->commit();
     	return true;
     }
