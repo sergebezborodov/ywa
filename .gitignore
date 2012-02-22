@@ -3,3 +3,4 @@ tmp/*
 public/assets/*
 local.php
 database.php
+database-test.php
