@@ -1,122 +1,99 @@
 <?php
 
+class ActiveRecordException extends AppException
+{}
+
+
 /**
- * Базовый класс ActiveRecord
+ * Extended active record class with helper functions
  */
-abstract class BaseActiveRecord extends CActiveRecord {
-	
-   /**
-    * Поле которое содержит дату создания записи
-    * @var string
-    */
-    protected $_createdField = 'created_date';
-    
-   /**
-    * Поле которое содержит дату редактирования записи
-    * @var string
-    */
-    protected $_updatedField = 'updated_date';
+class ActiveRecord extends CActiveRecord
+{
+    /**
+     * @var string field name with record creation date
+     */
+    protected $createdField = 'created_date';
 
     /**
-     * @var string название поля для url alias названия
+     * @var string field name with record last update date
      */
-    protected $_slugField = 'slug';
+    protected $updatedField = 'updated_date';
 
     /**
-     * @var string название поля с названием объекта (title, name, etc)
-     */
-    protected $_titleField = 'title';
-
-    
-    protected $_lastErrorMessage = null;
- 
-    static protected $_transaction;
-    
-    /**
-	 * Проставляет дату создания и модификации записи
-	 * 
-	 * @return bool
-     */
-    protected function beforeSave() {
-    	if (!parent::beforeSave()) {
-    		return false;
-    	}
-
-        if (isset($this->metadata->tableSchema->columns[$this->_updatedField])){
-            $this->{$this->_updatedField} = new CDbExpression('NOW()');
-        }
-    	if ($this->isNewRecord) {
-    		if (isset($this->metadata->tableSchema->columns[$this->_createdField])){
-            	$this->{$this->_createdField} = new CDbExpression('NOW()');
-    		}
-        }
- 
-        return true;  
-    }
-    
-    public function beforeValidate() {
-    	if (!parent::beforeValidate()) {
-    		return false;
-    	}
-    	if (isset($this->metadata->tableSchema->columns[$this->_slugField],
-                 $this->metadata->tableSchema->columns[$this->_titleField])
-            && empty($this->{$this->_slugField})) {
-
-            $this->slug = $this->createUrlName($this->{$this->_titleField});
-        }
-    	return true;
-    }
-    
-    /**
-     * Устанавливает последнее сообщение об ошибке
-     * 
-     * @param string $message
-     * @return bool false
-     */
-    public function onError($message = null) {
-    	$this->_lastErrorMessage = $message;
-    	return false;
-    }
-    
-    /**
-     * Возвращает последнее сообщение об ошибке
-     * @return string
-     */
-    public function getLastErrorMessage() {
-    	if (empty($this->_lastErrorMessage)) {
-    		$this->_lastErrorMessage = 'Ошибка в процессе выполнения';
-    	}
-    	return $this->_lastErrorMessage;
-    }
-    
-    
-    /**
-     * Начало транзакции
-     * 
+     * Sets created and updated field values
+     *
      * @return bool true
      */
-    public static function start() {
-    	self::$_transaction = Yii::app()->db->beginTransaction();
-    	return true;
+    protected function beforeSave()
+    {
+        if (!parent::beforeSave()) {
+            return false;
+        }
+
+        if (isset($this->getMetaData()->tableSchema->columns[$this->updatedField])) {
+            $this->{$this->updatedField} = new CDbExpression('NOW()');
+        }
+
+        if ($this->isNewRecord && isset($this->getMetaData()->tableSchema->columns[$this->createdField])) {
+            $this->{$this->createdField} = new CDbExpression('NOW()');
+        }
+
+        return true;
     }
-    
+
+
     /**
-     * Откат транзакции
-     * 
-     * @return bool true
+     * Start DB transaction
+     *
+     * @param CDbConnection $connection
+     * @return CDbTransaction
      */
-    public static function rollBack() {
-    	self::$_transaction->rollBack();
-    	return true;
+    public static function beginTransaction($connection = null)
+    {
+        if ($connection === null) {
+            $connection = Yii::app()->getDb();
+        }
+
+        return $connection->beginTransaction();
     }
-    
+
     /**
-     * Коммит транзакции
-     * 
-     * @return bool true
+     * Commit current DB connection transaction
+     *
+     * @static
+     * @param CDbConnection $connection
      */
-    public static function commit() {
-    	self::$_transaction->commit();
-    	return true;
+    public static function commitTransaction($connection = null)
+    {
+        if ($connection === null) {
+            $connection = Yii::app()->getDb();
+        }
+
+        /** @var CDbTransaction $transaction */
+        if (($transaction = $connection->getCurrentTransaction()) === null) {
+            throw new ActiveRecordException('Transaction not started');
+        }
+
+        $transaction->commit();
+    }
+
+    /**
+     * Rollback current DB connection transaction
+     *
+     * @static
+     * @param CDbConnection $connection
+     */
+    public static function rollbackTransaction($connection = null)
+    {
+        if ($connection === null) {
+            $connection = Yii::app()->getDb();
+        }
+
+        /** @var CDbTransaction $transaction */
+        if (($transaction = $connection->getCurrentTransaction()) === null) {
+            throw new ActiveRecordException('Transaction not started');
+        }
+
+        $transaction->rollback();
     }
 }

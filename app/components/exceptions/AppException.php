@@ -3,8 +3,9 @@
 /**
  * Эксепшен приложения
  */
-class AppException extends CException {
-    protected $_data;
+class AppException extends CException
+{
+    protected $data;
 
     /**
      * Создание исключения
@@ -13,17 +14,19 @@ class AppException extends CException {
      * @param int $code код ошибки
      * @param array $data дополнительные данные
      */
-    public function __construct($message, $code = 0, $data = array()) {
+    public function __construct($message, $code = 0, $data = array())
+    {
         $this->message = $message;
         $this->code = $code;
 
-        $this->_data = $data;
+        $this->data = $data;
     }
 
     /**
      * @return array доп данные исключения
      */
-    public function getData() {
-        return $this->_data;
+    public function getData()
+    {
+        return $this->data;
     }
 }
