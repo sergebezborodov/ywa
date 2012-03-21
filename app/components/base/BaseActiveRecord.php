@@ -7,7 +7,7 @@ class ActiveRecordException extends AppException
 /**
  * Extended active record class with helper functions
  */
-class ActiveRecord extends CActiveRecord
+class BaseActiveRecord extends CActiveRecord
 {
     /**
      * @var string field name with record creation date

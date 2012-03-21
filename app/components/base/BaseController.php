@@ -1,13 +1,13 @@
 <?php
 /**
- * Базовый контроллер приложения
+ * Base application controller
  *
  * @property string pageTitle
  */
 abstract class BaseController extends CController
 {
 	/**
-	 * @var string текущий layout
+	 * @var string current layout
 	 */
 	public $layout = '/layouts/column1';
 
@@ -17,45 +17,45 @@ abstract class BaseController extends CController
 	public $breadcrumbs = array();
 
     /**
-     * @var string meta описание
+     * @var string meta description
      */
     public $metaDesc = '';
 
     /**
-     * @var string meta ключевые слова
+     * @var string meta keywords
      */
     public $metaKeys = '';
 
 	/**
-	 * @var string страница по умолчанию для редиректа с ошибкой
+	 * @var string default error redirect page
 	 */
 	protected $defaultErrorRedirect = '/';
 
     /**
-     * Редирект с флешкой
+     * Redirect with error flash
      *
      * @param string $msg
      * @param array $redirect
      * @return void
      */
-	protected function _denyRequest($msg = '', $redirect = array())
+	protected function denyRequest($msg = '', $redirect = array())
     {
-		if (Y::request()->isAjaxRequest) {
+		if (Yii::app()->getRequest()->isAjaxRequest) {
 			$result = array(
 				'result'	=> 'error',
 				'message'	=> $msg,
 			);
-			Y::endJson($result);
+            $this->jsonEnd($result);
 		} else {
 			if (empty($redirect)) {
-				if (Y::request()->urlReferrer) {
-					$redirect = Y::request()->urlReferrer;
+				if (Yii::app()->getRequest()->urlReferrer) {
+					$redirect = Yii::app()->getRequest()->urlReferrer;
 				} else {
 					$redirect = $this->defaultErrorRedirect;
 				}
 	        }
 	        if (!empty($msg)) {
-	        	$this->_flash($msg, 'error');
+	        	$this->errorFlash($msg);
 	        }
 	        $this->redirect($redirect);
 		}
@@ -63,6 +63,8 @@ abstract class BaseController extends CController
 
 
     /**
+     * Output json and and application
+     *
      * @param string $message
      * @param array $data
      */
@@ -76,6 +78,8 @@ abstract class BaseController extends CController
     }
 
     /**
+     * Output json and and application
+     *
      * @param string $message
      * @param array $data
      */
@@ -89,30 +93,30 @@ abstract class BaseController extends CController
     }
 
 	/**
-	 * Установка флешки
+	 * Set session flash
 	 *
-	 * @param string $msg сообщение
-	 * @param string $type тип сообщения
+	 * @param string $msg message
+	 * @param string $type message type success|error
 	 * @return void
 	 */
-	protected function _flash($msg, $type = 'success')
+	protected function flash($msg, $type = 'success')
     {
 		Yii::app()->user->setFlash($type, $msg);
 	}
 
     /**
-     * Флешка об ошибке
+     * Sets error type flash
      *
-     * @param  $message
+     * @param string $message
      * @return void
      */
-    protected function _errorFlash($message)
+    protected function errorFlash($message)
     {
-        $this->_flash($message, 'error');
+        $this->flash($message, 'error');
     }
 
 	/**
-	 * Валидец ли id объекта
+	 * Check if $id is valid and make integer value
 	 *
 	 * @param int $id
 	 * @return bool
@@ -128,7 +132,7 @@ abstract class BaseController extends CController
 
 
 	/**
-	 * Главная ли это страница
+	 * Check if current is main page
 	 *
 	 * @return bool
 	 */
@@ -139,24 +143,7 @@ abstract class BaseController extends CController
 	}
 
     /**
-     * Вспомогательные действия
-     *
-     * @param $action
-     * @return bool
-     */
-    public function beforeAction($action)
-    {
-        $uri = $_SERVER['REQUEST_URI'];
-        if (strlen($uri) > 1
-            && $uri{strlen($uri) - 1} == '/') {
-            $this->redirect(substr($uri, 0, strlen($uri) - 1), true, 301);
-        }
-
-        return true;
-    }
-
-    /**
-     * Покдлючение скриптов
+     * Register scripts
      *
      * @param $view
      * @return bool
@@ -165,8 +152,8 @@ abstract class BaseController extends CController
     {
         parent::beforeRender($view);
 
-        // для ajax никакие скрипт файлы не подключаем
-        if (Y::isAjaxRequest()) {
+        // if ajax request don't attach any script
+        if (Yii::app()->getRequest()->getIsAjaxRequest()) {
             return true;
         }
 
@@ -189,28 +176,23 @@ abstract class BaseController extends CController
 
 
     /**
-     * Загрузка модели по id
+     * Load model by ID
      *
      * @throws CHttpException
-     * @param string $modelName
-     * @param bool $checkOwner проверять владельца по user_id
-     * @param string $userIdFieldName название поле с id пользователя модели
-     * @return ActiveRecord
+     * @param string $modelName model class name
+     * @param int $modelId
+     * @return BaseActiveRecord
      */
-    protected function _loadModel($modelName, $checkOwner = false, $userIdFieldName = 'user_id')
+    protected function loadModel($modelName, $modelId = null)
     {
-        if (empty($_GET['id'])) {
-            throw new CHttpException(400, 'Не указан id модели');
+        if ($modelId === null && empty($_GET['id'])) {
+            throw new CHttpException(400, "Bad request");
         }
-        $model = BaseActiveRecord::model($modelName)->findByPk($_GET['id']);
+        $id = $modelId === null ? $_GET['id'] : $modelId;
+        $model = BaseActiveRecord::model($modelName)->findByPk($id);
         if ($model === null) {
-            throw new CHttpException(404, "Запись #{$_GET['id']} модели {$modelName} не найдена");
+            throw new CHttpException(404, "Record #{$id} of model {$modelName} not found");
         }
-        if ($checkOwner && !empty($model->{$userIdFieldName}) && $model->{$userIdFieldName} != Y::userId()) {
-            throw new CHttpException(403, 'Доступ не разрешен');
-        }
-
         return $model;
     }
-
 }

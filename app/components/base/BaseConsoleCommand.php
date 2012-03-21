@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Базовый класс для консольных команд
+ * Base class for console command
  */
 abstract class BaseConsoleCommand extends CConsoleCommand
 {
 
     /**
-     * Вывод текста в консоль
+     * Output text to console
      *
      * @param string $text
      */

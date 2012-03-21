@@ -1,6 +1,6 @@
 <?php
 /**
- * Настройки консольного приложения
+ * Console app config
  */
 
 return array(

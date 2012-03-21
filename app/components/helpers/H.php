@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Вспомогательные функции
+ * Helper function
  */
 class H {
 
     /**
-     * Задание сида для генератора рандомных чисел
+     * Set seed for random generator
      *
      * @static var bool $thisProcessHasBeenInitialized
      * @return void
@@ -25,13 +25,13 @@ class H {
     }
 
     /**
-     * Генерация рандомных строк
+     * Generate random string
      *
      * @param int $len
      * @param string $type
      * @return string
      */
-    public static function generateRandomString($len = 32, $type = "default") {
+    public static function generateRandomString($len = 32, $type = 'default') {
         self::randomizeProcessSeed();
         $randomText = null;
         for($i = 0; $i < $len; $i++) {
@@ -56,30 +56,41 @@ class H {
         return $randomText;
     }
 
-    public static function calculateSize($size, $sep = ' ') {
+    /**
+     * Return human format for file size
+     *
+     * @static
+     * @param $size
+     * @param string $sep
+     * @return string
+     */
+    public static function fileSize($size, $sep = ' ') {
         $unit = null;
-        $units = array('байт', 'КБ', 'МБ', 'ГБ', 'ТБ');
+        $units = array('byte', 'kb', 'Mb', 'Gb', 'Tb');
 
         for($i = 0, $c = count($units); $i < $c; $i++) {
             if ($size > 1024)
             {
-                    $size = $size / 1024;
+                $size = $size / 1024;
             }
             else
             {
-                    $unit = $units[$i];
-                    break;
+                $unit = $units[$i];
+                break;
             }
         }
 
         return round($size, 2).$sep.$unit;
     }
 
-    public static function generateFileName() {
-            return md5(self::generateRandomString() . 'jaja!!!' . time());
-    }
 
-
+    /**
+     * Generate sql date form
+     *
+     * @static
+     * @param null $timestamp
+     * @return string
+     */
     public static function sqldate($timestamp = null) {
         $format = "Y-m-d H:i:s";
         return (empty($timestamp)) ? date($format) : date($format, $timestamp);

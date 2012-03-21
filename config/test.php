@@ -1,6 +1,6 @@
 <?php
 /**
- * Настройки приложения для тестирования
+ * Config for unit test
  */
 
 return array(

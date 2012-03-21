@@ -1,6 +1,6 @@
 <?php
 /**
- * Общие настройки для всех типов приложений
+ * Shared settings for all application types
  */
 
 define('DS', DIRECTORY_SEPARATOR);
@@ -25,8 +25,6 @@ return array(
         'application.components.helpers.*',
 
         'application.models.*',
-
-        'ext.logger.*',
 	),
 
 	// application components

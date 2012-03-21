@@ -1,6 +1,6 @@
 <?php
 /**
- * Настройки веб приложения
+ * Web application config
  */
 
 return array(

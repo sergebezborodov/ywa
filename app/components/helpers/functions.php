@@ -12,6 +12,7 @@ function ddd($var) {
 function dar($var) {
     Y::dar($var);
 }
+
 function dd($var) {
     echo "<pre>";
     print_r($var);

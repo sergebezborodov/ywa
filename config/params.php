@@ -1,6 +1,6 @@
 <?php
 
-// настройки приложения
+// custom application settings
 return array(
 
 );
